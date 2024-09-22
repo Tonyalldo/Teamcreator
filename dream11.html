@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Team Allocator</title>
+  <link rel="shortcut icon" type="x-icon" href="dreamlogo.jpg">
+  <link rel="stylesheet" type="text/css" href="example.css">
+  <style>
+    /* Basic styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: grey;
+      color: white;
+      margin: 0;
+      padding: 0;
+      background-size: cover;
+      background-repeat: no-repeat;
+      text-align: center;
+    }
+
+    h1 {
+      margin-top: 20px;
+      font-size: 2.5em;
+    }
+
+    input[type="number"] {
+      padding: 10px;
+      font-size: 1em;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1.2em;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 0;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    label {
+      font-size: 1.2em;
+    }
+
+    #teams div {
+      border: 1px solid white;
+      padding: 10px;
+      margin: 10px;
+      border-radius: 5px;
+      background-color: rgba(0, 0, 0, 0.6);
+    }
+
+    /* Media query for responsiveness */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      input[type="number"], button {
+        width: 80%;
+        font-size: 1.1em;
+      }
+
+      #teams div {
+        font-size: 0.9em;
+        padding: 5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.5em;
+      }
+
+      input[type="number"], button {
+        width: 90%;
+        font-size: 1em;
+      }
+
+      #teams div {
+        font-size: 0.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Team Allocator</h1>
+
+  <h3><label for="numMembers">Enter number of players:</label>
+  <input type="number" id="numMembers">
+  <br>
+  <button onclick="getNames()">Submit</button></h3>
+
+  <div id="nameFields"></div>
+  <div id="teams"></div>
+
+  <script>
+    let players = [];
+
+    // Function to create input fields for names based on the number of players
+    function getNames() {
+      const numMembers = parseInt(document.getElementById('numMembers').value);
+      const nameFields = document.getElementById('nameFields');
+      nameFields.innerHTML = '';  // Clear previous fields
+
+      // You can still check for valid input if needed
+      if (isNaN(numMembers) || numMembers <= 0) {
+        nameFields.innerHTML = 'Please enter a valid number of players.';
+        return;
+      }
+
+      for (let i = 0; i < numMembers; i++) {
+        const label = document.createElement('label');
+        label.innerHTML = `Enter name for player ${i+1}: `;
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id = `player${i+1}`;
+        
+        nameFields.appendChild(label);
+        nameFields.appendChild(input);
+        nameFields.appendChild(document.createElement('br'));
+      }
+
+      const submitNamesButton = document.createElement('button');
+      submitNamesButton.innerHTML = 'Create Teams';
+      submitNamesButton.onclick = createTeams;
+      nameFields.appendChild(submitNamesButton);
+    }
+
+    // Function to shuffle an array (for randomizing teams)
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Function to create teams with the entered names
+    function createTeams() {
+      players = [];
+      const numMembers = parseInt(document.getElementById('numMembers').value);
+
+      // Collect player names
+      for (let i = 0; i < numMembers; i++) {
+        const playerName = document.getElementById(`player${i+1}`).value;
+        if (playerName) {
+          players.push(playerName);
+        }
+      }
+
+      const teams = document.getElementById('teams');
+      teams.innerHTML = '';  // Clear previous team displays
+
+      // Ensure that we have at least 11 players
+      if (players.length < 11) {
+        const extraMessage = document.createElement('p');
+        extraMessage.innerHTML = `You need at least 11 players to assign teams. Only ${players.length} players provided.`;
+        teams.appendChild(extraMessage);
+        return;
+      }
+
+      // Now we are creating 20 teams, each with 11 random members
+      const numberOfTeams = 20;
+      for (let i = 0; i < numberOfTeams; i++) {
+        const team = document.createElement('div');
+        team.innerHTML = `<h3>Team ${i + 1}</h3>`;
+        
+        // Shuffle the player list and select the first 11 players for each team
+        const shuffledPlayers = shuffle([...players]);
+        for (let j = 0; j < 11; j++) {
+          const member = document.createElement('p');
+          member.innerHTML = `Player: ${shuffledPlayers[j % shuffledPlayers.length]}`;
+          team.appendChild(member);
+        }
+        
+        teams.appendChild(team);
+      }
+    }
+  </script>
+</body>
+</html>
